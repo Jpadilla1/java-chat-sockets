@@ -8,6 +8,7 @@ import java.net.Socket;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -84,8 +85,16 @@ public class ChatClient {
     private String getName() {
         return JOptionPane.showInputDialog(
             frame,
-            "Choose a screen name:",
-            "Screen name selection",
+            "Login with your username & password:",
+            "Login",
+            JOptionPane.PLAIN_MESSAGE);
+    }
+    
+    private String getPassword() {
+        return JOptionPane.showInputDialog(
+            frame,
+            "Enter your password:",
+            "Login",
             JOptionPane.PLAIN_MESSAGE);
     }
 
@@ -104,8 +113,12 @@ public class ChatClient {
         // Process all messages from server, according to the protocol.
         while (true) {
             String line = in.readLine();
-            if (line.startsWith("SUBMITNAME")) {
-                out.println(getName());
+            System.out.println(line);
+            
+            if (line.startsWith("LOGINUSERNAME")) {
+                    out.println(getName());
+            } else if (line.startsWith("LOGINPASSWORD")) {
+                out.println(getPassword());
             } else if (line.startsWith("NAMEACCEPTED")) {
                 textField.setEditable(true);
             } else if (line.startsWith("MESSAGE")) {

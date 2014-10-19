@@ -28,7 +28,7 @@ public class DbUtils {
                 Object obj = model.newInstance();
                 Field[] fields = getFields(model);
                 for (int i = 0; i < rs.getMetaData().getColumnCount() && i < fields.length; i++) {
-                    fields[i].set(obj, rs.getObject(i));
+                    fields[i].set(obj, rs.getObject(i+1));
                 }
                 objects.add(obj);
             }
@@ -45,7 +45,7 @@ public class DbUtils {
                 Object obj = model.newInstance();
                 Field[] fields = getFields(model);
                 for (int i = 0; i < rs.getMetaData().getColumnCount() && i < fields.length; i++) {
-                    fields[i].set(obj, rs.getObject(i));
+                    fields[i].set(obj, rs.getObject(i+1));
                 }
                 object = obj;
             }
@@ -75,14 +75,10 @@ public class DbUtils {
     static HashMap<String, String> validatePk(Class model, Object pk) {
         HashMap<String, String> errors = new HashMap<>();
         Field f = getPkField(model);
-        try {
-            if (f.get(pk) == null) {
-                    errors.put(f.getName(), ServiceConstants.FIELD_MUST_NOT_BE_NULL);
-            } else if (!f.getClass().isAssignableFrom(f.get(pk).getClass())) {
-                errors.put(f.getName(), "Value assigned to field is not applicable.");
-            }
-        } catch (IllegalArgumentException | IllegalAccessException ex) {
-            Logger.getLogger(DbUtils.class.getName()).log(Level.SEVERE, null, ex);
+        if (pk == null) {
+            errors.put(f.getName(), ServiceConstants.FIELD_MUST_NOT_BE_NULL);
+        } else if (!f.getClass().isAssignableFrom(pk.getClass())) {
+            errors.put(f.getName(), "Value assigned to field is not applicable.");
         }
         return errors;
     }
@@ -110,7 +106,11 @@ public class DbUtils {
                 fields.add(field);
             }
         }
-        return (Field[]) fields.toArray();
+        Field[] dbFields = new Field[fields.size()];
+        for (int i = 0; i < dbFields.length; i++) {
+            dbFields[i] = fields.get(i);
+        }
+        return dbFields;
     }
      
 }

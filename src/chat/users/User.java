@@ -21,32 +21,40 @@ import java.sql.ResultSet;
 public class User extends Model {
     
     @DbField(type="pk")
-    String username;
+    public String username;
     
     @DbField(type="field")
-    String password;
+    public String password;
+    
+    private Boolean exists = false;
+    
+    public User() {}
     
     public User (String username, String password) {
         this.username = username;
         this.password = password;
+        
+        if (getOne(this.username) != null) {
+            exists = true;
+        }
+    }
+    
+    public Boolean exists() {
+        return this.exists;
     }
     
     public String getUsername() {
         return this.username;
     }
     
-    public boolean userExists() {
-        return (getOne(this.username) == null);
-    }
-
     public boolean signIn() {
-        return userExists() && checkPassword();
+        return this.exists && checkPassword();
     }
 
     public boolean signUp() {
         if (username == null || password == null) {
             return false;
-        } else return !userExists() && createUser();
+        } else return !this.exists() && createUser();
     }
 
     private boolean checkPassword() {
@@ -55,9 +63,10 @@ public class User extends Model {
             
             Connection conn = DriverManager.getConnection(ServiceConstants.CONNECTION_STRING);
             
-            String sql = "SELECT username FROM USER WHERE username = " 
-                    + this.username +" AND password = " + this.password + ";";
+            String sql = "SELECT username FROM USER WHERE username = '" 
+                    + this.username +"' AND password = '" + this.password + "';";
             ResultSet rs = conn.createStatement().executeQuery(sql);
+            
             if (rs.next()) {
                 return true;
             }

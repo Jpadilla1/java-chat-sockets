@@ -105,7 +105,7 @@ public class ChatServer {
                 // checking for the existence of a name and adding the name
                 // must be done while locking the set of names.
                 while (true) {
-                    out.println("LOGINNAME");
+                    out.println("LOGINUSERNAME");
                     String name = in.readLine();
                     out.println("LOGINPASSWORD");
                     String password = in.readLine();
@@ -114,7 +114,7 @@ public class ChatServer {
                     }
                     user = new User(name, password);
                     synchronized (users) {
-                        if (user.getOne(name) != null && !users.contains(user) && user.signIn()) {
+                        if (user.exists() && !users.contains(user) && user.signIn()) {
                             users.add(user);
                             break;
                         }

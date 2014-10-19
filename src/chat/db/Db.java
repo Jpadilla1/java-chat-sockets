@@ -87,8 +87,8 @@ public class Db {
         if (f == null) {
             return object;
         }
-        String sql = "SELECT * FROM " + model.getName() + " WHERE " + f.getName() + " = " + pk + ";";
-
+        String sql = "SELECT * FROM " + model.getSimpleName() + " WHERE " + f.getName() + " = '" + pk + "';";
+        
         getConnection();
         try {
             object = DbUtils.rsToObject(conn.createStatement().executeQuery(sql), model);
