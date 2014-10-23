@@ -2,22 +2,8 @@ package chat.users;
 
 import chat.db.DbField;
 import chat.db.Model;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.util.HashMap;
-import chat.services.ServiceConstants;
-import java.sql.Connection;
-import java.sql.ResultSet;
+import static chat.services.ServiceConstants.EQUAL;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-/**
- *
- * @author josepadilla
- */
 public class User extends Model {
     
     @DbField(type="pk")
@@ -54,31 +40,10 @@ public class User extends Model {
     public boolean signUp() {
         if (username == null || password == null) {
             return false;
-        } else return !this.exists() && createUser();
+        } else return !this.exists() && create(this);
     }
 
     private boolean checkPassword() {
-        try {
-            Class.forName(ServiceConstants.SQLITE_CLASS_NAME);
-            
-            Connection conn = DriverManager.getConnection(ServiceConstants.CONNECTION_STRING);
-            
-            String sql = "SELECT username FROM USER WHERE username = '" 
-                    + this.username +"' AND password = '" + this.password + "';";
-            ResultSet rs = conn.createStatement().executeQuery(sql);
-            
-            if (rs.next()) {
-                return true;
-            }
-            conn.close();
-        } catch (ClassNotFoundException | SQLException e) {
-            return false;
-        }
-        return false;
+        return search(getFields("", this), this, EQUAL).size() == 1;
     }
-
-    private boolean createUser() {
-        return create(this);
-    }
-    
 }
