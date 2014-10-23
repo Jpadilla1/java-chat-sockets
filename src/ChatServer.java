@@ -6,7 +6,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.HashMap;
 import java.util.HashSet;
 
 /**
@@ -92,6 +91,7 @@ public class ChatServer {
          * the client in a global set, then repeatedly gets inputs and
          * broadcasts them.
          */
+        @Override
         public void run() {
             try {
 
@@ -121,14 +121,16 @@ public class ChatServer {
                     }
                 }
 
-                // Now that a successful name has been chosen, add the
-                // socket's print writer to the set of all writers so
-                // this client can receive broadcast messages.
+//                // Now that a successful name has been chosen, add the
+//                // socket's print writer to the set of all writers so
+//                // this client can receive broadcast messages.
                 out.println("NAMEACCEPTED");
                 writers.add(out);
-
-                // Accept messages from this client and broadcast them.
-                // Ignore other clients that cannot be broadcasted to.
+//                
+                System.out.println(new User().getAll());
+//
+//                // Accept messages from this client and broadcast them.
+//                // Ignore other clients that cannot be broadcasted to.
                 while (true) {
                     String input = in.readLine();
                     if (input == null) {

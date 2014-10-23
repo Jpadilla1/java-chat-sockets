@@ -8,7 +8,6 @@ import java.net.Socket;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -116,7 +115,7 @@ public class ChatClient {
             System.out.println(line);
             
             if (line.startsWith("LOGINUSERNAME")) {
-                    out.println(getName());
+                out.println(getName());
             } else if (line.startsWith("LOGINPASSWORD")) {
                 out.println(getPassword());
             } else if (line.startsWith("NAMEACCEPTED")) {

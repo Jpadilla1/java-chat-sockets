@@ -11,6 +11,8 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,7 +34,7 @@ public class Db {
         try {
             Class.forName(SQLITE_CLASS_NAME);
         } catch (ClassNotFoundException ex) {
-            System.err.println(ex.getMessage());
+            Logger.getLogger(Db.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -40,7 +42,7 @@ public class Db {
         try {
             conn = DriverManager.getConnection(CONNECTION_STRING);
         } catch (SQLException ex) {
-            System.err.println(ex.getMessage());
+            Logger.getLogger(Db.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -51,13 +53,13 @@ public class Db {
             }
             conn.close();
         } catch (SQLException ex) {
-            System.err.println(ex.getMessage());
+            Logger.getLogger(Db.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     public ArrayList<Object> selectAll(Class model) {
         ArrayList<Object> objects = new ArrayList<>();
-        String sql = "SELECT * FROM " + model.getName() + ";";
+        String sql = "SELECT * FROM " + model.getSimpleName() + ";";
         getConnection();
         try {
             objects = DbUtils.rsToArrayOfObjects(conn.createStatement().executeQuery(sql), model);
@@ -68,9 +70,45 @@ public class Db {
         return objects;
     }
     
-    public ArrayList<Object> search(Class model, String field, Object object) {
+    public ArrayList<Object> searchEqual(Class model, HashMap<String, String> fields, Object object) {
         ArrayList<Object> objects = new ArrayList<>();
-        String sql = "SELECT * FROM " + model.getName() + " WHERE " + field + " LIKE %" + object.toString() + ";";
+        String sql = "SELECT * FROM " + model.getSimpleName()+ " WHERE ";
+        int i = 0;
+        for (Map.Entry<String, String> entrySet : fields.entrySet()) {
+            String key = entrySet.getKey();
+            String value = entrySet.getValue();
+            if (i > 0) {
+                sql += " AND ";
+            }
+            sql += key + " = '" + value + "'";
+            i++;
+        }
+        sql += ";";
+        System.out.println(sql);
+        getConnection();
+        try {
+            objects = DbUtils.rsToArrayOfObjects(conn.createStatement().executeQuery(sql), model);
+        } catch (SQLException ex) {
+            Logger.getLogger(Db.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        closeConnection();
+        return objects;
+    }
+    
+    public ArrayList<Object> searchLike(Class model, HashMap<String, String> fields, Object object) {
+        ArrayList<Object> objects = new ArrayList<>();
+        String sql = "SELECT * FROM " + model.getSimpleName()+ " WHERE ";
+        int i = 0;
+        for (Map.Entry<String, String> entrySet : fields.entrySet()) {
+            String key = entrySet.getKey();
+            String value = entrySet.getValue();
+            if (i > 0) {
+                sql += " AND ";
+            }
+            sql += key + " LIKE %'" + value + "'";
+            i++;
+        }
+        sql += ";";
         getConnection();
         try {
             objects = DbUtils.rsToArrayOfObjects(conn.createStatement().executeQuery(sql), model);
@@ -103,7 +141,7 @@ public class Db {
     public boolean create(Class model, Object object) {
         try {
             Field[] fields = DbUtils.getFields(model);
-            String sql = "INSERT INTO " + model.getName() + " (";
+            String sql = "INSERT INTO " + model.getSimpleName()+ " (";
             for (int i = 0; i < fields.length - 1; i++) {
                 sql += fields[i].getName() + ", ";
             }
@@ -127,7 +165,7 @@ public class Db {
         if (f == null) {
             return false;
         }
-        String sql = "DELETE FROM " + model.getName() + " WHERE " + f.getName() + " = '" + pk.toString() + "';";
+        String sql = "DELETE FROM " + model.getSimpleName()+ " WHERE " + f.getName() + " = '" + pk.toString() + "';";
         try {
             getConnection();
             conn.createStatement().executeUpdate(sql);

@@ -5,9 +5,12 @@
  */
 package chat.db;
 
+import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,8 +48,8 @@ public abstract class Model implements CRUDS {
     }
 
     @Override
-    public ArrayList<Object> search(String field, Object object) {
-        return db.search(this.getClass(), field, object);
+    public ArrayList<Object> search(HashMap<String, String> fields, Object object, Boolean equalOrLike) {
+        return (equalOrLike)? db.searchEqual(this.getClass(), fields, object) : db.searchLike(this.getClass(), fields, object);
     }
     
     private void handleError(HashMap<String, String> errors) {
@@ -71,8 +74,20 @@ public abstract class Model implements CRUDS {
         return null;
     }
     
-    public ArrayList<?> rsToList (Class model, ResultSet rs) {
-        return DbUtils.rsToArrayOfObjects(rs, model);
+    public HashMap<String, String> getFields(String excludedFields, Object object) {
+        HashMap<String, String> fields = new HashMap<>();
+        Field[] dbFields = DbUtils.getFields(this.getClass());
+        List<String> excluded = Arrays.asList(excludedFields.split(","));
+        for (Field dbField : dbFields) {
+            if (!excluded.contains(dbField.getName())) {
+                try {
+                    fields.put(dbField.getName(), dbField.get(object).toString());
+                } catch (IllegalArgumentException | IllegalAccessException ex) {
+                    Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+        return fields;
     }
     
 }

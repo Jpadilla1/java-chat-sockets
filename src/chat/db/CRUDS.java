@@ -6,6 +6,7 @@
 package chat.db;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  *
@@ -21,6 +22,6 @@ public interface CRUDS {
     
     boolean delete(Object pk);
     
-    ArrayList<Object> search(String field, Object object);
+    ArrayList<Object> search(HashMap<String, String> fields, Object object, Boolean equalOrLike);
     
 }

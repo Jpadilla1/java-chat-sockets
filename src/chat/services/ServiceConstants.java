@@ -16,9 +16,13 @@ public interface ServiceConstants {
     String MESSAGE = "message";
     String USER = "user";
     String USERNAME = "username";
+    String PASSWORD = "password";
     String SQLITE_CLASS_NAME = "org.sqlite.JDBC";
     String SQLITE_CONNECTION = "jdbc:sqlite:";
     String DB_NAME = "chat.db";
     String CONNECTION_STRING = SQLITE_CONNECTION + DB_NAME;
-    String FIELD_MUST_NOT_BE_NULL = "Field must not be null.";   
+    String FIELD_MUST_NOT_BE_NULL = "Field must not be null.";
+    
+    Boolean EQUAL = true;
+    Boolean LIKE = false;
 }
