@@ -1,3 +1,5 @@
+package chat.server;
+
 import chat.rooms.Room;
 import chat.users.User;
 import java.io.BufferedReader;
